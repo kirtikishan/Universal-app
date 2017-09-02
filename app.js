@@ -1,7 +1,12 @@
+require('babel-core/register')({
+    "presets": ["es2015", "react", "stage-1"]
+});
+
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 var httpProxy = require('http-proxy');
+var requestHandler = require('./requestHandler.js');
 
 var app = express();
 
@@ -12,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Start of proxy
 
 const apiProxy = httpProxy.createProxyServer({
-   target: 'http://localhost:3001'
+    target: 'http://localhost:3001'
 });
 
 app.use('/api', function (req, res) {
@@ -21,9 +26,8 @@ app.use('/api', function (req, res) {
 
 // END of proxy
 
-app.get('*', function (req, res) {
-    res.sendFile(path.resolve(__dirname, "public", "index.html"))
-})
+app.set('view engine', 'ejs');
+app.use(requestHandler);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
